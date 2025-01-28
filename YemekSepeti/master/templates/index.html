@@ -1,10 +1,24 @@
-{% extends "./base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
 
-<div>
-	Hello index.
+<div class="container mt-5">
+	<h1 class="text-center text-light mb-4">Available Stores</h1>
+	<div class="row">
+		{% for store in stores %}
+		<div class="col-md-4 mb-4">
+			<div class="card bg-secondary text-light">
+				<div class="card-header">{{ store.name }}</div>
+				<div class="card-body">
+					<p class="card-text">{{ store.address }}</p>
+					<a href="{% url 'master:store' store.id %}" class="btn btn-primary">View Menu</a>
+				</div>
+			</div>
+		</div>
+		{% empty %}
+		<p class="text-light">No stores available at the moment.</p>
+		{% endfor %}
+	</div>
 </div>
-
 
 {% endblock %}
