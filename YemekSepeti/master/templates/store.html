@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<h2>{{ store.name }} - Menu</h2>
+
+	<!-- Display Menu Items -->
+	<div class="row">
+		{% for menu in menus %}
+		<div class="col-md-4 mb-4">
+			<div class="card bg-secondary text-white">
+				<div class="card-body">
+					<h5 class="card-title">{{ menu.name }}</h5>
+					<p class="card-text">{{ menu.description }}</p>
+					<p class="card-text"><strong>Price:</strong> ${{ menu.price }}</p>
+
+					<!-- Add to cart button -->
+					<form action="{% url 'master:order_add_item' store.id %}" method="POST">
+						{% csrf_token %}
+						<input type="hidden" name="menu_id" value="{{ menu.id }}">
+						<input type="hidden" name="store_id" value="{{ store.id }}">
+						<label for="quantity">Quantity:</label>
+						<input type="number" name="quantity" min="1" value="1" class="form-control mb-2">
+
+						<div class="form-group">
+							<label for="customizations">Customizations:</label>
+							<div id="customizations_{{ menu.id }}">
+								{% for ingredient in menu_item.ingredients.all %}
+								<div class="form-check">
+									<input class="form-check-input" type="checkbox"
+										name="customizations_{{ ingredient.id }}" value="1">
+									<label class="form-check-label" for="customizations_{{ ingredient.id }}">
+										{{ ingredient.name }}
+									</label>
+								</div>
+								{% endfor %}
+							</div>
+						</div>
+
+						<button type="submit" class="btn btn-primary">Add to Cart</button>
+					</form>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+
+	<!-- Display Cart -->
+	<div class="mt-5">
+		<h4>Current Cart</h4>
+		{% if order.order_items %}
+		<ul class="list-group">
+			{% for item in order.order_items %}
+			<li class="list-group-item">
+				{{ item.quantity }} x {{ item.menu_id.name }}
+				<ul>
+					{% for customization in item.customizations %}
+					<li>
+						{% if customization.action %}
+						Added: {{ customization.ingredient_id.name }}
+						{% else %}
+						Removed: {{ customization.ingredient_id.name }}
+						{% endif %}
+					</li>
+					{% endfor %}
+				</ul>
+			</li>
+			{% endfor %}
+		</ul>
+		{% else %}
+		<p>Your cart is empty.</p>
+		{% endif %}
+	</div>
+</div>
+
+{% endblock %}
