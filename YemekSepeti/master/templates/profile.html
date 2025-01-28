@@ -1,10 +1,43 @@
-{% extends "./base.html" %}
+{% extends 'base.html' %}
 
 {% block content %}
 
-<div>
-	Hello profile.
-</div>
+<div class="container mt-4">
+	<h2>Your Order History</h2>
 
+	{% if orders %}
+	<div class="list-group">
+		{% for order in orders %}
+		<div class="list-group-item my-3 rounded p-3 bg-dark border">
+			<div class="card">
+				<div class="card-header justify-content-between">
+					Order #{{ order.id }} - {{order.order_date|date:"Y-m-d" }} - ${{ order.total_price}}
+				</div>
+				<ul class="list-group p-3">
+					{% for item in order.order_items.all %}
+					<li class="rounded border list-group-item my-2 p-3">
+						<strong>{{ item.menu_item.name }}</strong> (x{{ item.quantity }}) - ${{ item.base_price }}
+						<ul class="list-group">
+							{% for customization in item.customizations.all %}
+							<li class="rounded border list-group-item my-1 p-2">
+								{% if customization.action == 1 %}
+								Added: {{ customization.ingredient.name }} - ${{ customization.ingredient.price }}
+								{% else %}
+								Removed: {{ customization.ingredient.name }}
+								{% endif %}
+							</li>
+							{% endfor %}
+						</ul>
+					</li>
+					{% endfor %}
+				</ul>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	{% else %}
+	<p>You have no orders yet.</p>
+	{% endif %}
+</div>
 
 {% endblock %}
